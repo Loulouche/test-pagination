@@ -14,6 +14,7 @@ export default function App() {
   const [category, setCategory] = useState("");
   const [sort,     setSort]     = useState("createdAt");
   const [order,    setOrder]    = useState("desc");
+  const [showTop, setShowTop] = useState(false);
 
   //search bar
   const [search, setSearch] = useState("");
@@ -40,6 +41,18 @@ export default function App() {
     .finally(() => setLoading(false));
   }, [page, limit, category, sort, order, search]);
 
+  useEffect(() => {
+  const handleScroll = () => setShowTop(window.scrollY > 300);
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
+  const getStockColor = (stock) => {
+    if (stock < 10) return "#E24B4A";
+    if (stock < 30) return "#EF9F27";
+    return "#639922";
+  };
+  
   return (
     <div className="app">
       <div className="header">
@@ -54,6 +67,7 @@ export default function App() {
               setPage(1);
               }}
             />
+            <div className="selects">
             <select value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
             <option value="">Toutes categories</option>
             <option value="shoes">Chaussures</option>
@@ -70,6 +84,8 @@ export default function App() {
             <option value="asc">Croissant</option>
             <option value="desc">Decroissant</option>
           </select>
+            </div>
+            
         </div>
       </div>
 
@@ -81,28 +97,46 @@ export default function App() {
           {products.length === 0 ? (
             <p className="empty">Aucun produit trouve.</p>
           ) : (
-            <div className="table-wrap">
-              <table>
-              <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Catégorie</th>
-                    <th>Prix</th>
-                </tr>
-              </thead>
-
-              {products.map((product) => (
-                <tr key={product._id}>
-                  <td>{product.name}</td>
-                  <td>{product.category}</td>
-                  <td>{product.price} €</td>
-                </tr>
-              ))}
-              </table>
-            </div>
-            
+            <>
+              <div className="stock-legend">
+                <span className="total-results">Nombre de produits : {pagination.total}</span>
+                <div style={{display: "flex", gap: "1rem"}}>
+                  <span><span className="dot" style={{ background: "#E24B4A" }}></span> Stock critique (&lt;10)</span>
+                  <span><span className="dot" style={{ background: "#EF9F27" }}></span> Stock faible (&lt;30)</span>
+                  <span><span className="dot" style={{ background: "#639922" }}></span> En stock</span>
+                </div>
+              </div>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nom</th>
+                      <th>Catégorie</th>
+                      <th>Quantité</th>
+                      <th>Prix</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {products.map((product) => (
+                      <tr key={product._id}>
+                        <td>{product.name}</td>
+                        <td>{product.category}</td>
+                        <td>
+                          <span className="dot" style={{
+                            background: product.stock < 10 ? "#E24B4A" : product.stock < 30 ? "#EF9F27" : "#639922"
+                          }}></span>
+                          {product.stock}
+                        </td>
+                        <td>{product.price} €</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
-          {pagination && (
+
+      {pagination && (
   <div className="pagination">
     <button onClick={() => setPage(p => p - 1)} disabled={page === 1}>{"<"}</button>
 
@@ -130,7 +164,7 @@ export default function App() {
             key={p}
             onClick={() => setPage(p)}
             disabled={p === page}
-            style={p === page ? { fontWeight: "bold", background: "#e0e0e0" } : {}}
+            style={p === page ? { fontWeight: "bold", background: "#e5e0d8" } : {}}
           >
             {p}
           </button>
@@ -141,6 +175,13 @@ export default function App() {
     <button onClick={() => setPage(p => p + 1)} disabled={page === pagination.totalPages}>{">"}</button>
   </div>
 )}
+        {showTop && (
+        <button
+          className="back-to-top"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          ↑
+        </button>)}
         </>
       )}
     </div>
