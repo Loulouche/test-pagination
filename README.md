@@ -61,7 +61,7 @@ Le reste (outillage, structure des dossiers, librairies UI) est laissé au candi
 - **Modalité d’interaction** (boutons vs scroll infini, etc.) : libre, tant que le chargement reste **incrémental côté serveur**.
 
 
-## Modifications apportées 
+# Modifications apportées 
 ## Backend
 
 ### Connexion à la base de données
