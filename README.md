@@ -136,7 +136,7 @@ J'ai branché le filtre à l'API pour qu'il envoie la catégorie sélectionnée 
 
 ### CSS et expérience utilisateur
 
-J'ai choisi un fond blanc cassé légèrement chaud (`#f0ede8`) pour une meilleure expérience visuelle, qui contraste bien avec les éléments blancs comme les boutons et le tableau.
+J'ai choisi un fond blanc cassé légèrement chaud (`#f0ede8`) pour une meilleure expérience visuelle, qui contraste bien avec les éléments blancs comme les boutons.
 
 Au survol d'une ligne du tableau, celle-ci se grise légèrement pour guider l'œil de l'utilisateur et faciliter la lecture.
 
