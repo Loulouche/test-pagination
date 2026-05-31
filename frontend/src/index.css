@@ -199,3 +199,28 @@ table {
   font-size: 13px;
   color: #888;
 }
+
+
+.limit-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  font-size: 13px;
+  color: #888;
+}
+
+.limit-selector button {
+  padding: 4px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.limit-selector button:hover {
+  border-color: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}

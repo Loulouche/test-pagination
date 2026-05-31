@@ -10,7 +10,7 @@ export default function App() {
   const [error,      setError]      = useState(null);
 
   const [page,     setPage]     = useState(1);
-  const [limit]                 = useState(50); //init = 10
+  const [limit, setLimit]       = useState(50); //init = 10
   const [category, setCategory] = useState("");
   const [sort,     setSort]     = useState("createdAt");
   const [order,    setOrder]    = useState("desc");
@@ -18,6 +18,7 @@ export default function App() {
 
   //search bar
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -39,13 +40,21 @@ export default function App() {
     })
     .catch((err) => setError(err.message))
     .finally(() => setLoading(false));
-  }, [page, limit, category, sort, order, search]);
+  }, [page, limit, category, sort, order, debouncedSearch]);
 
   useEffect(() => {
   const handleScroll = () => setShowTop(window.scrollY > 300);
   window.addEventListener("scroll", handleScroll);
   return () => window.removeEventListener("scroll", handleScroll);
 }, []);
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setDebouncedSearch(search);
+    setPage(1);
+  }, 300);
+  return () => clearTimeout(timer);
+}, [search]);
 
   const getStockColor = (stock) => {
     if (stock < 10) return "#E24B4A";
@@ -75,12 +84,13 @@ export default function App() {
             <option value="accessories">Accessoires</option>
             <option value="bags">Sacs</option>
           </select>
-          <select value={sort} onChange={(e) => setSort(e.target.value)}>
+          <select value={sort} onChange={(e) => { setSort(e.target.value); setPage(1); }}>
             <option value="createdAt">Date</option>
             <option value="price">Prix</option>
             <option value="name">Nom</option>
+            <option value="stock">Quantité</option>
           </select>
-          <select value={order} onChange={(e) => setOrder(e.target.value)}>
+          <select value={order} onChange={(e) => { setOrder(e.target.value); setPage(1); }}>
             <option value="asc">Croissant</option>
             <option value="desc">Decroissant</option>
           </select>
@@ -105,6 +115,18 @@ export default function App() {
                   <span><span className="dot" style={{ background: "#EF9F27" }}></span> Stock faible (&lt;30)</span>
                   <span><span className="dot" style={{ background: "#639922" }}></span> En stock</span>
                 </div>
+              </div>
+              <div className="limit-selector">
+                <span>Articles par page :</span>
+                {[10, 25, 50, 100].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => { setLimit(n); setPage(1); }}
+                    style={limit === n ? { fontWeight: "500", background: "#e5e0d8", borderColor: "#1a1a1a" } : {}}
+                  >
+                    {n}
+                  </button>
+                ))}
               </div>
               <div className="table-wrap">
                 <table>

@@ -12,6 +12,12 @@ async function start() {
   await client.connect();
   console.log("Connecté à MongoDB");
 
+  process.on("SIGINT", async () => {
+    await client.close();
+    process.exit(0);
+  });
+
+  
   const db = client.db("shop");
   app.locals.db = db;
 
@@ -38,8 +44,12 @@ async function start() {
 
     //tri
     let sort = "createdAt";
-    if (req.query.sort === "price") sort = "price";
-    else if (req.query.sort === "name") sort = "name";
+    if (req.query.sort === "price") 
+      sort = "price";
+    else if (req.query.sort === "name") 
+      sort = "name";
+    else if (req.query.sort === "stock") 
+      sort = "stock";
 
     //ordre 
     let order = -1;
@@ -48,8 +58,11 @@ async function start() {
     const filter = {};
     if (category) 
       filter.category = category;
-    if (search) 
-      filter.name = { $regex: search, $options: "i" };
+    if (search)
+    {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      filter.name = { $regex: escaped, $options: "i" };
+    }
 
     const skip = (page - 1) * limit;
 
