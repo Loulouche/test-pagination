@@ -143,3 +143,12 @@ Au survol d'une ligne du tableau, celle-ci se grise légèrement pour guider l'�
 J'ai ajouté des animations de survol sur les boutons de pagination, la barre de recherche et les selects : une bordure qui s'assombrit et une légère ombre apparaissent au survol pour indiquer que l'élément est cliquable.
 
 Les boutons non cliquables (page courante, première ou dernière page déjà atteinte) sont grisés visuellement pour indiquer à l'utilisateur qu'ils ne sont pas disponibles.
+
+### Améliorations envisagées
+
+Lors de la réception de ce projet, aucune date limite n'a été indiquée. Par souci de réactivité et étant donné que je mène ce projet en parallèle de mes cours et de leurs échéances, j'ai priorisé une livraison rapide tout en essayant d'implémenter un maximum de fonctionnalités pertinentes. J'ai donc fait des choix en me concentrant sur une bonne gestion et lecture des données.
+
+Pour aller plus loin, il aurait été intéressant d'ajouter des fonctionnalités d'interaction avec la base de données :
+- Un bouton pour modifier un article (nom, prix, stock)
+- Un bouton pour ajouter un nouvel article
+- Un bouton pour supprimer un article
