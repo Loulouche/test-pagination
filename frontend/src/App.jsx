@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import Filters from "./Filters";
+import ProductTable from "./ProductTable";
+import Pagination from "./Pagination";
+
 
 const API_URL = "/api/products";
 
@@ -20,6 +24,7 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // Récupère les produits depuis l'API à chaque changement de filtre, tri, page ou recherche
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -42,12 +47,16 @@ export default function App() {
     .finally(() => setLoading(false));
   }, [page, limit, category, sort, order, debouncedSearch]);
 
+
+ // Affiche le bouton "retour en haut" quand l'utilisateur scrolle de plus de 300px
   useEffect(() => {
   const handleScroll = () => setShowTop(window.scrollY > 300);
   window.addEventListener("scroll", handleScroll);
   return () => window.removeEventListener("scroll", handleScroll);
 }, []);
 
+// Attend 300ms après la dernière frappe avant de lancer la recherche (debounce)
+// évite d'envoyer une requête à chaque lettre tapée
 useEffect(() => {
   const timer = setTimeout(() => {
     setDebouncedSearch(search);
@@ -66,51 +75,27 @@ useEffect(() => {
     <div className="app">
       <div className="header">
         <h1>Catalogue produits</h1>
-        <div className="filters">
-          <input
-            type="text"
-            placeholder="Rechercher un produit..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-              }}
-            />
-            <div className="selects">
-            <select value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
-            <option value="">Toutes categories</option>
-            <option value="shoes">Chaussures</option>
-            <option value="clothing">Vetements</option>
-            <option value="accessories">Accessoires</option>
-            <option value="bags">Sacs</option>
-          </select>
-          <select value={sort} onChange={(e) => { setSort(e.target.value); setPage(1); }}>
-            <option value="createdAt">Date</option>
-            <option value="price">Prix</option>
-            <option value="name">Nom</option>
-            <option value="stock">Quantité</option>
-          </select>
-          <select value={order} onChange={(e) => { setOrder(e.target.value); setPage(1); }}>
-            <option value="asc">Croissant</option>
-            <option value="desc">Decroissant</option>
-          </select>
-            </div>
-            
-        </div>
+        <Filters
+          search={search} setSearch={setSearch}
+          category={category} setCategory={setCategory}
+          sort={sort} setSort={setSort}
+          order={order} setOrder={setOrder}
+          setPage={setPage}
+        />
       </div>
 
       {loading && <p className="loading">Chargement...</p>}
-      {error   && <p className="error">Erreur : {error}</p>}
+      {error && <p className="error">Erreur : {error}</p>}
 
       {!loading && !error && (
         <>
           {products.length === 0 ? (
-            <p className="empty">Aucun produit trouve.</p>
+            <p className="empty">Aucun produit trouvé.</p>
           ) : (
             <>
               <div className="stock-legend">
                 <span className="total-results">Nombre de produits : {pagination.total}</span>
-                <div style={{display: "flex", gap: "1rem"}}>
+                <div style={{ display: "flex", gap: "1rem" }}>
                   <span><span className="dot" style={{ background: "#E24B4A" }}></span> Stock critique (&lt;10)</span>
                   <span><span className="dot" style={{ background: "#EF9F27" }}></span> Stock faible (&lt;30)</span>
                   <span><span className="dot" style={{ background: "#639922" }}></span> En stock</span>
@@ -128,83 +113,20 @@ useEffect(() => {
                   </button>
                 ))}
               </div>
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Nom</th>
-                      <th>Catégorie</th>
-                      <th>Quantité</th>
-                      <th>Prix</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((product) => (
-                      <tr key={product._id}>
-                        <td>{product.name}</td>
-                        <td>{product.category}</td>
-                        <td>
-                          <span className="dot" style={{
-                            background: product.stock < 10 ? "#E24B4A" : product.stock < 30 ? "#EF9F27" : "#639922"
-                          }}></span>
-                          {product.stock}
-                        </td>
-                        <td>{product.price} €</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ProductTable products={products} />
             </>
           )}
 
-      {pagination && (
-  <div className="pagination">
-    <button onClick={() => setPage(p => p - 1)} disabled={page === 1}>{"<"}</button>
-
-    {(() => {
-      const pages = [];
-      const total = pagination.totalPages;
-
-      if (total <= 7) {
-        for (let i = 1; i <= total; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        if (page > 3) pages.push("...");
-        for (let i = Math.max(2, page - 1); i <= Math.min(total - 1, page + 1); i++) {
-          pages.push(i);
-        }
-        if (page < total - 2) pages.push("...");
-        pages.push(total);
-      }
-
-      return pages.map((p, i) =>
-        p === "..." ? (
-          <span key={i} className="page-info">...</span>
-        ) : (
-          <button
-            key={p}
-            onClick={() => setPage(p)}
-            disabled={p === page}
-            style={p === page ? { fontWeight: "bold", background: "#e5e0d8" } : {}}
-          >
-            {p}
-          </button>
-        )
-      );
-    })()}
-
-    <button onClick={() => setPage(p => p + 1)} disabled={page === pagination.totalPages}>{">"}</button>
-  </div>
-)}
-        {showTop && (
-        <button
-          className="back-to-top"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        >
-          ↑
-        </button>)}
+          {pagination && (
+            <Pagination page={page} totalPages={pagination.totalPages} setPage={setPage} />
+          )}
         </>
+      )}
+
+      {showTop && (
+        <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+          ↑
+        </button>
       )}
     </div>
   );
