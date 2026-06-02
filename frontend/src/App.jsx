@@ -31,8 +31,8 @@ export default function App() {
     const params = new URLSearchParams({page, limit, sort, order});
     if (category) 
       params.append("category", category);
-    if (search) 
-      params.append("search", search);
+    if (debouncedSearch) 
+      params.append("search", debouncedSearch);
 
   fetch(`/api/products?${params}`)
     .then((res) => {
@@ -65,11 +65,6 @@ useEffect(() => {
   return () => clearTimeout(timer);
 }, [search]);
 
-  const getStockColor = (stock) => {
-    if (stock < 10) return "#E24B4A";
-    if (stock < 30) return "#EF9F27";
-    return "#639922";
-  };
 
   const handleDelete = (id) => {
   fetch(`/api/products/${id}`, { method: "DELETE" })

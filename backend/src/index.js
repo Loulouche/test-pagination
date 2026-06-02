@@ -1,23 +1,15 @@
 const express  = require("express");
 const cors     = require("cors");
 const { MongoClient } = require("mongodb");
+const { ObjectId } = require("mongodb");
 require("dotenv").config();
 
 const app       = express();
 const PORT      = process.env.PORT || 3001;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017";
 
-async function start() {
-  const client = new MongoClient(MONGO_URI);
-  await client.connect();
-  console.log("Connecté à MongoDB");
 
-  process.on("SIGINT", async () => {
-    await client.close();
-    process.exit(0);
-  });
-
-  function parseQueryParams(query) {
+function parseQueryParams(query) {
   let page = parseInt(query.page) || 1;
   if (page < 1) page = 1;
 
@@ -54,6 +46,16 @@ async function fetchProducts(db, filter, sort, order, skip, limit) {
   ]);
   return { products, total };
 }
+
+async function start() {
+  const client = new MongoClient(MONGO_URI);
+  await client.connect();
+  console.log("Connecté à MongoDB");
+
+  process.on("SIGINT", async () => {
+    await client.close();
+    process.exit(0);
+  });
   
   const db = client.db("shop");
   app.locals.db = db;
@@ -81,15 +83,11 @@ async function fetchProducts(db, filter, sort, order, skip, limit) {
     }
   });
   app.delete("/api/products/:id", async(req, res) =>{
-    const id = req.params.id
-
     try {
-      const bd = req.app.locals.db
-      const { ObjectId } = require("mongodb");
       const id = req.params.id;
       const result  = await db.collection("products").deleteOne({ _id: new ObjectId(id) });
 
-      if (result.deleteCount === 0)
+      if (result.deletedCount === 0)
         return res.status(404).json({ error: "Produit non trouvé" });
 
       res.json({ success: true });
