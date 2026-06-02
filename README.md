@@ -79,11 +79,30 @@ Les données sont récupérées via deux requêtes MongoDB lancées en parallèl
 
 Les erreurs serveur sont gérées avec un `try/catch` qui renvoie un code 500.
 
+### Route `DELETE /api/products/:id`
+
+J'ai ajouté une route DELETE qui supprime un produit par son identifiant MongoDB.
+Si le produit n'existe pas, la route renvoie un code 404. Les erreurs serveur sont gérées avec un `try/catch` qui renvoie un code 500.
+
+### Structure du code
+
+Les fonctions auxiliaires ont été extraites de la route principale pour améliorer la lisibilité :
+- `parseQueryParams` : parse et valide tous les paramètres de la requête
+- `buildFilter` : construit le filtre MongoDB selon la catégorie et la recherche
+- `fetchProducts` : exécute les requêtes MongoDB
+
 ## Frontend
 
 ### Tableau des produits
 
 J'ai structuré l'affichage des produits sous forme de tableau avec les colonnes : nom, catégorie, quantité et prix.
+
+### Structure des composants
+
+Le frontend a été découpé en composants réutilisables :
+- `Filters` : barre de recherche et selects de filtres/tris
+- `ProductTable` : tableau des produits
+- `Pagination` : navigation entre les pages
 
 ### Appel à l'API
 
@@ -102,6 +121,11 @@ L'objectif est de pouvoir, dans une catégorie précise (ex : chaussures), reche
 J'ai implémenté une pagination avec des boutons `<` et `>` pour naviguer page par page.
 Le bouton `<` est désactivé sur la première page et `>` sur la dernière.
 Les numéros affichés sont : toujours la première page, toujours la dernière, la page courante ainsi que ses voisines immédiates. Des `...` sont affichés entre les groupes de pages quand il y a un écart.
+
+### Suppression d'un produit
+
+J'ai ajouté un bouton de suppression sur chaque ligne du tableau. Un clic appelle la route `DELETE /api/products/:id` et retire immédiatement le produit de l'affichage sans recharger la page. Le compteur de produits se met à jour en conséquence.
+
 
 ### Bouton retour en haut
 
@@ -149,6 +173,7 @@ Les boutons non cliquables (page courante, première ou dernière page déjà at
 Lors de la réception de ce projet, aucune date limite n'a été indiquée. Par souci de réactivité et étant donné que je mène ce projet en parallèle de mes cours et de leurs échéances, j'ai priorisé une livraison rapide tout en essayant d'implémenter un maximum de fonctionnalités pertinentes. J'ai donc fait des choix en me concentrant sur une bonne gestion et lecture des données.
 
 Pour aller plus loin, il aurait été intéressant d'ajouter des fonctionnalités d'interaction avec la base de données :
-- Un bouton pour modifier un article (nom, prix, stock)
-- Un bouton pour ajouter un nouvel article
-- Un bouton pour supprimer un article
+
+- Export du catalogue filtré en CSV
+- Modification d'un article (nom, prix, stock) directement depuis le tableau
+- Ajout d'un nouvel article via un formulaire

@@ -224,3 +224,21 @@ table {
   border-color: #1a1a1a;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
+.delete-btn {
+  background: #c0392b;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
+}
+
+.delete-btn:hover {
+  background: #a93226;
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.5);
+  transform: scale(1.05);
+}

@@ -70,6 +70,16 @@ useEffect(() => {
     if (stock < 30) return "#EF9F27";
     return "#639922";
   };
+
+  const handleDelete = (id) => {
+  fetch(`/api/products/${id}`, { method: "DELETE" })
+    .then((res) => {
+      if (!res.ok) throw new Error("Erreur suppression");
+      setProducts((prev) => prev.filter((p) => p._id !== id));
+      setPagination((prev) => ({...prev, total: prev.total - 1}));
+    })
+    .catch((err) => setError(err.message));
+};
   
   return (
     <div className="app">
@@ -113,7 +123,7 @@ useEffect(() => {
                   </button>
                 ))}
               </div>
-              <ProductTable products={products} />
+              <ProductTable products={products} onDelete={handleDelete} />
             </>
           )}
 

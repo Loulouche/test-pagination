@@ -80,6 +80,27 @@ async function fetchProducts(db, filter, sort, order, skip, limit) {
       res.status(500).json({ error: "Erreur serveur" });
     }
   });
+  app.delete("/api/products/:id", async(req, res) =>{
+    const id = req.params.id
+
+    try {
+      const bd = req.app.locals.db
+      const { ObjectId } = require("mongodb");
+      const id = req.params.id;
+      const result  = await db.collection("products").deleteOne({ _id: new ObjectId(id) });
+
+      if (result.deleteCount === 0)
+        return res.status(404).json({ error: "Produit non trouvé" });
+
+      res.json({ success: true });
+      
+    } catch (error) {
+
+      res.status(500).json({ error: "Erreur serveur" });
+      
+    }
+
+  });
 
   app.listen(PORT, () => console.log("Serveur demarre sur http://localhost:" + PORT));
 }
